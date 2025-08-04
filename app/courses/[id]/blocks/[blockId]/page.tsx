@@ -13,7 +13,7 @@ import ReactMarkdown from "react-markdown"
 export default function BlockPage() {
   const params = useParams()
   const router = useRouter()
-  const { addXP, claimTokens } = useWallet()
+  const { addXP, claimTokens, address } = useWallet()
 
   const courseId = params.id as string
   const blockId = params.blockId as string
@@ -27,13 +27,15 @@ export default function BlockPage() {
   const [quizScore, setQuizScore] = useState(0)
 
   useEffect(() => {
-    // Check if block is already completed
-    const savedBlocks = localStorage.getItem(`completed_${courseId}`)
+    // Check if block is already completed for this wallet
+    if (!address) return
+    const courseKey = `completed_${courseId}_${address}`
+    const savedBlocks = localStorage.getItem(courseKey)
     if (savedBlocks) {
       const completedBlocks = JSON.parse(savedBlocks)
       setIsCompleted(completedBlocks.includes(blockId))
     }
-  }, [courseId, blockId])
+  }, [courseId, blockId, address])
 
   if (!course || !block) {
     return (
@@ -50,27 +52,29 @@ export default function BlockPage() {
   const nextBlock = course.blocks[currentBlockIndex + 1]
   const prevBlock = course.blocks[currentBlockIndex - 1]
 
-  const markAsCompleted = () => {
+  const markAsCompleted = async () => {
     if (isCompleted) return
 
-    // Save to localStorage
-    const savedBlocks = localStorage.getItem(`completed_${courseId}`)
+    // Save to localStorage for this wallet
+    if (!address) return
+    const courseKey = `completed_${courseId}_${address}`
+    const savedBlocks = localStorage.getItem(courseKey)
     const completedBlocks = savedBlocks ? JSON.parse(savedBlocks) : []
 
     if (!completedBlocks.includes(blockId)) {
       completedBlocks.push(blockId)
-      localStorage.setItem(`completed_${courseId}`, JSON.stringify(completedBlocks))
+      localStorage.setItem(courseKey, JSON.stringify(completedBlocks))
 
-      // Update course progress
+      // Update course progress for this wallet
       const progress = (completedBlocks.length / course.blocks.length) * 100
-      const savedProgress = localStorage.getItem("courseProgress") || "{}"
+      const progressKey = `courseProgress_${address}`
+      const savedProgress = localStorage.getItem(progressKey) || "{}"
       const courseProgress = JSON.parse(savedProgress)
       courseProgress[courseId] = progress
-      localStorage.setItem("courseProgress", JSON.stringify(courseProgress))
+      localStorage.setItem(progressKey, JSON.stringify(courseProgress))
 
-      // Add XP and tokens
-      addXP(block.xpReward)
-      claimTokens(block.tokenReward)
+      // Add tokens only (XP comes from streaks only)
+      await claimTokens(block.tokenReward)
 
       setIsCompleted(true)
     }
@@ -164,10 +168,7 @@ export default function BlockPage() {
               </p>
               {quizScore >= 70 && (
                 <div className="flex items-center justify-center space-x-4">
-                  <div className="flex items-center space-x-1">
-                    <Zap className="h-5 w-5 text-amber-500" />
-                    <span className="font-semibold">+{block.xpReward} XP</span>
-                  </div>
+
                   <div className="flex items-center space-x-1">
                     <Trophy className="h-5 w-5 text-green-500" />
                     <span className="font-semibold">+{block.tokenReward} FET</span>
@@ -199,12 +200,10 @@ export default function BlockPage() {
                 <Badge variant={block.type === "quiz" ? "destructive" : "secondary"}>
                   {block.type === "quiz" ? "Quiz" : "Lesson"}
                 </Badge>
-                <div className="flex items-center space-x-2 text-sm text-slate-500">
-                  <Zap className="h-4 w-4" />
-                  <span>{block.xpReward} XP</span>
-                  <Trophy className="h-4 w-4" />
-                  <span>{block.tokenReward} FET</span>
-                </div>
+                                  <div className="flex items-center space-x-2 text-sm text-slate-500">
+                    <Trophy className="h-4 w-4" />
+                    <span>{block.tokenReward} FET</span>
+                  </div>
               </div>
             </div>
 

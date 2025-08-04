@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation"
 import { getCourse } from "@/lib/course-data"
+import { useWallet } from "@/components/wallet-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -12,20 +13,26 @@ import { useEffect, useState } from "react"
 
 export default function CourseDetailPage() {
   const params = useParams()
+  const { address } = useWallet()
   const courseId = params.id as string
   const course = getCourse(courseId)
   const [completedBlocks, setCompletedBlocks] = useState<string[]>([])
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    // Load completed blocks from localStorage
-    const savedBlocks = localStorage.getItem(`completed_${courseId}`)
+    // Load completed blocks from localStorage for this wallet
+    if (!address || !courseId) return
+    const courseKey = `completed_${courseId}_${address}`
+    const savedBlocks = localStorage.getItem(courseKey)
     if (savedBlocks) {
       const blocks = JSON.parse(savedBlocks)
       setCompletedBlocks(blocks)
       setProgress((blocks.length / (course?.blocks.length || 1)) * 100)
+    } else {
+      setCompletedBlocks([])
+      setProgress(0)
     }
-  }, [courseId, course])
+  }, [courseId, course, address])
 
   if (!course) {
     return (
@@ -60,10 +67,7 @@ export default function CourseDetailPage() {
     }
   }
 
-  const totalXPEarned = completedBlocks.reduce((total, blockId) => {
-    const block = course.blocks.find((b) => b.id === blockId)
-    return total + (block?.xpReward || 0)
-  }, 0)
+
 
   const totalTokensEarned = completedBlocks.reduce((total, blockId) => {
     const block = course.blocks.find((b) => b.id === blockId)
@@ -98,12 +102,7 @@ export default function CourseDetailPage() {
                 <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
                 <div className="text-sm text-slate-600">Complete</div>
               </div>
-              <div className="text-center p-4 bg-amber-50 rounded-lg">
-                <div className="text-2xl font-bold text-amber-700">
-                  {totalXPEarned}/{course.totalXP}
-                </div>
-                <div className="text-sm text-amber-600">XP Earned</div>
-              </div>
+
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <div className="text-2xl font-bold text-green-700">
                   {totalTokensEarned}/{course.totalTokens}
@@ -137,8 +136,6 @@ export default function CourseDetailPage() {
                             {block.type === "quiz" ? "Quiz" : "Lesson"}
                           </Badge>
                           <div className="flex items-center space-x-2 text-sm text-slate-500">
-                            <Zap className="h-4 w-4" />
-                            <span>{block.xpReward} XP</span>
                             <Trophy className="h-4 w-4" />
                             <span>{block.tokenReward} FET</span>
                           </div>
@@ -175,10 +172,7 @@ export default function CourseDetailPage() {
               <h2 className="text-2xl font-bold mb-2">Congratulations!</h2>
               <p className="text-lg mb-4">You've completed the {course.title} course and earned your badge!</p>
               <div className="flex items-center justify-center space-x-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{course.totalXP}</div>
-                  <div className="text-sm opacity-90">Total XP</div>
-                </div>
+
                 <div className="text-center">
                   <div className="text-2xl font-bold">{course.totalTokens}</div>
                   <div className="text-sm opacity-90">FET Tokens</div>

@@ -8,9 +8,11 @@ import { Wallet, Trophy, Zap, Copy, ExternalLink, Award } from "lucide-react"
 import { useState, useEffect } from "react"
 
 export default function WalletPage() {
-  const { isConnected, address, balance, xp } = useWallet()
+  const { isConnected, address, balance, xp, isLoading, error, refreshBalance } = useWallet()
   const [rewardHistory, setRewardHistory] = useState<any[]>([])
   const [badges, setBadges] = useState<string[]>([])
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
 
   useEffect(() => {
     // Load reward history and badges from localStorage
@@ -19,16 +21,24 @@ export default function WalletPage() {
       setRewardHistory(JSON.parse(savedHistory))
     }
 
-    // Calculate badges based on XP and completed courses
+    if (!address) return
+    const streakKey = `currentStreak_${address}`;
+    const longestStreakKey = `longestStreak_${address}`;
+    const savedStreak = localStorage.getItem(streakKey);
+    const savedLongestStreak = localStorage.getItem(longestStreakKey);
+    if (savedStreak) setCurrentStreak(parseInt(savedStreak));
+    if (savedLongestStreak) setLongestStreak(parseInt(savedLongestStreak));
+
+    // Calculate badges based on balance and streaks only
     const earnedBadges = []
-    if (xp >= 100) earnedBadges.push("🎯 First Steps")
-    if (xp >= 500) earnedBadges.push("📚 Knowledge Seeker")
-    if (xp >= 1000) earnedBadges.push("🏆 Finance Expert")
     if (balance >= 50) earnedBadges.push("💰 Token Collector")
     if (balance >= 100) earnedBadges.push("💎 Wealth Builder")
+    if (currentStreak >= 7) earnedBadges.push("🔥 Streak Master")
+    if (currentStreak >= 21) earnedBadges.push("⚡ Learning Legend")
+    if (longestStreak >= 50) earnedBadges.push("🏅 Consistency King")
 
     setBadges(earnedBadges)
-  }, [xp, balance])
+  }, [balance, currentStreak, longestStreak])
 
   const copyAddress = () => {
     if (address) {
@@ -101,11 +111,27 @@ export default function WalletPage() {
                 <CardTitle className="flex items-center space-x-2">
                   <Trophy className="h-5 w-5 text-green-600" />
                   <span>FET Token Balance</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={refreshBalance}
+                    disabled={isLoading}
+                    className="ml-auto"
+                  >
+                    {isLoading ? "Loading..." : "Refresh"}
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
-                  <div className="text-5xl font-bold text-green-600 mb-2">{balance}</div>
+                  {error && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-red-700 text-sm">{error}</p>
+                    </div>
+                  )}
+                  <div className="text-5xl font-bold text-green-600 mb-2">
+                    {isLoading ? "..." : balance}
+                  </div>
                   <div className="text-lg text-slate-600">FET Tokens</div>
                   <div className="text-sm text-slate-500 mt-2">≈ ${(balance * 0.45).toFixed(2)} USD</div>
                 </div>

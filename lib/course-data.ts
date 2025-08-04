@@ -5,7 +5,6 @@ export interface Block {
   content?: string
   tips?: string[]
   questions?: QuizQuestion[]
-  xpReward: number
   tokenReward: number
 }
 
@@ -23,7 +22,6 @@ export interface Course {
   description: string
   difficulty: "Beginner" | "Intermediate" | "Advanced"
   duration: string
-  totalXP: number
   totalTokens: number
   blocks: Block[]
   badge: string
@@ -36,7 +34,6 @@ export const courses: Course[] = [
     description: "Master the fundamentals of creating and maintaining a personal budget",
     difficulty: "Beginner",
     duration: "2 hours",
-    totalXP: 500,
     totalTokens: 50,
     badge: "💰",
     blocks: [
@@ -44,7 +41,6 @@ export const courses: Course[] = [
         id: "what-is-budgeting",
         title: "What is Budgeting?",
         type: "lesson",
-        xpReward: 50,
         tokenReward: 5,
         content: `
 # What is Budgeting?
@@ -78,7 +74,6 @@ Your goal is to make sure this number is positive every month.
         id: "budgeting-quiz",
         title: "Budgeting Knowledge Check",
         type: "quiz",
-        xpReward: 100,
         tokenReward: 10,
         questions: [
           {
@@ -118,7 +113,6 @@ Your goal is to make sure this number is positive every month.
         id: "creating-your-budget",
         title: "Creating Your First Budget",
         type: "lesson",
-        xpReward: 75,
         tokenReward: 8,
         content: `
 # Creating Your First Budget
@@ -175,7 +169,6 @@ Always pay yourself first! Set aside money for:
     description: "Learn effective strategies for building your savings and emergency fund",
     difficulty: "Beginner",
     duration: "1.5 hours",
-    totalXP: 400,
     totalTokens: 40,
     badge: "🏦",
     blocks: [
@@ -183,7 +176,6 @@ Always pay yourself first! Set aside money for:
         id: "why-save",
         title: "Why Saving Matters",
         type: "lesson",
-        xpReward: 50,
         tokenReward: 5,
         content: `
 # Why Saving Matters
@@ -220,7 +212,6 @@ That's a $172,000 difference just from starting 10 years earlier!
         id: "saving-quiz",
         title: "Saving Knowledge Check",
         type: "quiz",
-        xpReward: 100,
         tokenReward: 10,
         questions: [
           {
@@ -253,7 +244,6 @@ That's a $172,000 difference just from starting 10 years earlier!
     description: "Understand the basics of investing in stocks, bonds, and other assets",
     difficulty: "Intermediate",
     duration: "3 hours",
-    totalXP: 750,
     totalTokens: 75,
     badge: "📈",
     blocks: [
@@ -261,7 +251,6 @@ That's a $172,000 difference just from starting 10 years earlier!
         id: "what-is-investing",
         title: "What is Investing?",
         type: "lesson",
-        xpReward: 75,
         tokenReward: 8,
         content: `
 # What is Investing?

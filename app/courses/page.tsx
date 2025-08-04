@@ -114,11 +114,11 @@ export default function CoursesPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4 text-sm">
                       <div className="flex items-center space-x-1">
-                        <Zap className="h-4 w-4 text-amber-500" />
-                        <span>{course.totalXP} XP</span>
+                        {/* <Zap className="h-4 w-4 text-amber-500" /> */}
+                        {/* <span>{course.totalXP} XP</span> */}
                       </div>
                       <div className="flex items-center space-x-1">
-                        <Trophy className="h-4 w-4 text-green-500" />
+                        <Trophy className="h-6 w-4 text-green-500" />
                         <span>{course.totalTokens} FET</span>
                       </div>
                     </div>
