@@ -116,6 +116,12 @@ export default function FinanceLabPage() {
     setTxType("income")
   }
 
+  // Delete individual account
+  const handleDeleteAccount = (idx: number) => {
+    setAccounts(prev => prev.filter((_, i) => i !== idx))
+    if (expandedIdx === idx) setExpandedIdx(null)
+  }
+
   // Dashboard summary
   const allTransactions = accounts.flatMap(acc => acc.transactions)
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0)
@@ -220,6 +226,12 @@ export default function FinanceLabPage() {
                         onClick={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
                       >
                         {expandedIdx === idx ? "Hide Transactions" : "View Transactions"}
+                      </button>
+                      <button
+                        className="text-red-500 hover:bg-red-100 rounded px-2 py-1 text-xs font-medium border border-red-200"
+                        onClick={() => handleDeleteAccount(idx)}
+                      >
+                        Delete
                       </button>
                     </div>
                     {/* Transactions Section */}
