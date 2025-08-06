@@ -25,6 +25,9 @@ export function Navbar() {
               <Link href="/wallet" className="text-slate-600 hover:text-slate-900 font-medium">
                 Wallet
               </Link>
+              <Link href="/accounts" className="text-slate-600 hover:text-slate-900 font-medium">
+                Your Account
+              </Link>
             </div>
           </div>
 
