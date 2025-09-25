@@ -57,7 +57,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Master Your <span className="text-teal-400">Financial Future</span>
+              Master Your <span className="text-teal-400">Financial Literacy</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto">
               Learn personal finance through interactive courses and earn crypto tokens for your progress. No passwords,
